@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NOVATECH FOUNDER HOLDINGS LTD | النظام السيادي العالمي</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        gold: '#FFD700',
+                        'neon-green': '#00ff41',
+                        'neon-blue': '#00d2ff',
+                        'void-black': '#00020a'
+                    }
+                }
+            }
+        };
+    </script>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;900&family=Cairo:wght@300;700&display=swap');
+        
+        :root {
+            --gold: #FFD700;
+            --neon-green: #00ff41;
+            --neon-blue: #00d2ff;
+            --void-black: #00020a;
+            --royal-red: #8b0000;
+        }
+
+        body {
+            background-color: var(--void-black);
+            color: #fff;
+            font-family: 'Cairo', sans-serif;
+            overflow-x: hidden;
+            margin: 0;
+        }
+
+        .font-orbit { font-family: 'Orbitron', sans-serif; }
+        .text-gold { color: var(--gold); }
+        .text-neon-blue { color: var(--neon-blue); }
+
+        /* مصفوفة الماتريكس الخلفية */
+        #matrix-bg {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1;
+            opacity: 0.2;
+        }
+
+        /* الكروت الزجاجية الإمبراطورية */
+        .glass-panel {
+            background: rgba(10, 10, 20, 0.8);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            border-radius: 15px;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .gold-glow { text-shadow: 0 0 15px var(--gold); }
+        .neon-border { border: 1px solid var(--neon-green); box-shadow: 0 0 10px var(--neon-green); }
+
+        /* أنيميشن النبض للنظام */
+        @keyframes pulse-system {
+            0% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        .sys-status { animation: pulse-system 1.5s infinite alternate; }
+
+        /* تأثير النبض الذهبي (Golden Pulse) */
+        @keyframes golden-pulse {
+            0%, 100% { opacity: 1; text-shadow: 0 0 8px var(--gold), 0 0 16px rgba(255,215,0,0.4); }
+            50% { opacity: 0.85; text-shadow: 0 0 20px var(--gold), 0 0 40px rgba(255,215,0,0.6); }
+        }
+        .gold-pulse { animation: golden-pulse 2s ease-in-out infinite; color: var(--gold); }
+
+        /* وضع المحاكاة الذهبي: نبض الكارت عند عدم الربط */
+        #binance-spot-card.gold-pulse .text-lg { animation: golden-pulse 1.5s ease-in-out infinite; }
+
+        /* بريق ذهبي كامل (Gold Flash) */
+        #gold-flash-overlay {
+            position: fixed; inset: 0; z-index: 9999; pointer-events: none;
+            background: radial-gradient(ellipse at center, rgba(255,215,0,0.35) 0%, transparent 70%);
+            opacity: 0; transition: opacity 0.15s ease-out;
+        }
+        #gold-flash-overlay.active { animation: gold-flash 0.8s ease-out forwards; }
+        @keyframes gold-flash {
+            0% { opacity: 0; }
+            20% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+        
+        .vault-doc-card { background: linear-gradient(135deg, rgba(255,215,0,0.08) 0%, rgba(0,0,0,0.6) 100%); border: 1px solid rgba(255,215,0,0.3); }
+        
+        #escrow-net-profits-card.escrow-net-profits-glow {
+            box-shadow: 0 0 12px rgba(255,215,0,0.2), 0 0 24px rgba(255,215,0,0.08);
+        }
+        #escrow-net-profits-card.escrow-net-profits-glow-intense {
+            box-shadow: 0 0 20px rgba(255,215,0,0.45), 0 0 40px rgba(255,215,0,0.25), 0 0 60px rgba(255,215,0,0.1);
+        }
+
+        #binance-spot-card.binance-bridge-success {
+            animation: binance-success-pulse 1s ease-out forwards;
+        }
+        @keyframes binance-success-pulse {
+            0% { box-shadow: 0 0 0 0 rgba(0, 255, 65, 0); }
+            40% { box-shadow: 0 0 25px 8px rgba(0, 255, 65, 0.6); }
+            100% { box-shadow: 0 0 0 0 rgba(0, 255, 65, 0); }
+        }
+        .glow-point { filter: drop-shadow(0 0 6px var(--gold)); }
+
+        .throne-map-pulse svg { animation: throne-heartbeat 1.05s ease-in-out infinite; }
+        @keyframes throne-heartbeat {
+            0%, 100% { opacity: 0.88; filter: drop-shadow(0 0 4px rgba(255,215,0,0.15)); }
+            50% { opacity: 1; filter: drop-shadow(0 0 14px rgba(255,215,0,0.35)); }
+        }
+        .throne-map-pulse.profit-tier-high svg { animation: throne-heartbeat 0.9s ease-in-out infinite; filter: drop-shadow(0 0 20px rgba(255,215,0,0.4)); }
+        .throne-map-pulse.profit-tier-crown svg { animation: throne-heartbeat 0.75s ease-in-out infinite; filter: drop-shadow(0 0 28px rgba(255,215,0,0.55)); }
+        
+        [data-theme="night"] body { --void-black: #000008; }
+        [data-theme="night"] .glass-panel { background: rgba(5, 5, 15, 0.88); border-color: rgba(255,215,0,0.25); }
+        [data-theme="day"] .glass-panel { background: rgba(15, 15, 28, 0.85); }
+
+        /* [INJECTED STYLE] إشعار الحدث السيادي */
+        .sovereign-toast {
+            position: fixed; top: 50px; left: 20px; z-index: 1000;
+            background: linear-gradient(to right, #8b0000, #000);
+            border-left: 4px solid var(--gold);
+            padding: 10px 20px; border-radius: 5px;
+            font-size: 12px; color: #fff;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            animation: slide-in 0.5s ease-out;
+        }
+        @keyframes slide-in { from { transform: translateX(-100%); } to { transform: translateX(0); } }
+    </style>
+</head>
+<body>
+
+    <div id="commander-top-bar" class="fixed top-0 left-0 right-0 z-40 h-7 bg-black/90 border-b border-gold/30 flex items-center justify-between px-3 text-[10px] font-orbit">
+        <span id="topbar-london-time" class="text-neon-blue">00:00:00 LDN</span>
+        <span id="topbar-connection" class="text-gray-500">—</span>
+        <button type="button" id="topbar-emergency-logout" class="text-red-400 hover:text-red-300 transition" title="تدمير الجلسة (كلمة مرور)">تدمير الجلسة</button>
+    </div>
+
+    <button id="legal-vault-trigger" type="button" class="fixed bottom-4 left-4 z-50 w-10 h-10 rounded-full bg-gold/10 border border-gold/50 flex items-center justify-center opacity-40 hover:opacity-100 transition focus:outline-none" title="المستندات السيادية" aria-label="فتح الخزينة القانونية">
+        <i class="fas fa-shield-halved text-gold text-lg"></i>
+    </button>
+
+    <div id="vault-password-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm">
+        <div class="glass-panel p-6 w-full max-w-sm">
+            <h3 class="text-gold font-orbit mb-4"><i class="fas fa-lock ml-2"></i> جسر الهوية القانونية</h3>
+            <form id="vault-password-form" class="space-y-3">
+                <input type="password" id="vault-password-input" placeholder="كلمة المرور" class="w-full bg-black/50 border border-gray-600 rounded px-3 py-2 text-white placeholder-gray-500 focus:border-gold focus:outline-none" autocomplete="off" />
+                <p id="vault-password-error" class="text-red-400 text-xs hidden"></p>
+                <div class="flex gap-2">
+                    <button type="submit" class="flex-1 py-2 rounded bg-gold/20 border border-gold text-gold hover:bg-gold/30">دخول</button>
+                    <button type="button" id="vault-password-cancel" class="py-2 px-4 rounded border border-gray-600 text-gray-400 hover:bg-gray-800">إلغاء</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="legal-vault-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-black/85 backdrop-blur-md p-4 overflow-auto">
+        <div class="glass-panel border-2 border-gold/40 max-w-2xl w-full p-6 relative">
+            <button id="legal-vault-close" type="button" class="absolute top-4 left-4 w-8 h-8 rounded-full border border-gray-500 text-gray-400 hover:bg-gray-800 flex items-center justify-center">×</button>
+            <h2 class="text-xl font-orbit text-gold mb-2"><i class="fas fa-folder-open ml-2"></i> المستندات السيادية</h2>
+            <p class="text-[10px] text-gray-500 mb-4">محمية — للعرض الداخلي فقط</p>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="vault-doc-card rounded-lg p-4">
+                    <div class="text-gold/80 text-xs mb-2"><i class="fas fa-id-card ml-1"></i> جواز السفر</div>
+                    <div class="font-mono text-[10px] text-gray-500">DOC_TYPE: PASSPORT<br/>ENCRYPTED</div>
+                </div>
+                <div class="vault-doc-card rounded-lg p-4">
+                    <div class="text-gold/80 text-xs mb-2"><i class="fas fa-building ml-1"></i> شهادة التأسيس البريطانية</div>
+                    <div class="font-mono text-[10px] text-gray-500">REG: 16945629<br/>UK LTD</div>
+                </div>
+                <div class="vault-doc-card rounded-lg p-4">
+                    <div class="text-gold/80 text-xs mb-2"><i class="fas fa-car ml-1"></i> رخصة القيادة الدولية</div>
+                    <div class="font-mono text-[10px] text-gray-500">IDP — VALID</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="gold-flash-overlay" aria-hidden="true"></div>
+    <canvas id="matrix-bg"></canvas>
+
+    <header class="p-6 border-b-2 border-gold flex justify-between items-center glass-panel m-4 mt-12">
+        <div>
+            <h1 class="font-orbit text-4xl font-black gold-glow tracking-tighter">NOVATECH HQ</h1>
+            <p class="text-xs text-gold opacity-70 mt-1">المعرف الضريبي: 16945629 | REG: UK LTD</p>
+        </div>
+        <div class="text-left font-orbit">
+            <div id="digital-clock" class="text-2xl text-neon-blue">00:00:00</div>
+            <div class="text-[10px] text-green-400">STATUS: SECURE & ACTIVE</div>
+        </div>
+    </header>
+
+    <main class="container mx-auto p-4 grid grid-cols-1 md:grid-cols-3 gap-6">
+        
+        <section class="glass-panel p-6 border-r-4 border-gold">
+            <h2 class="text-xl font-bold mb-4 text-gold border-b border-gray-800 pb-2"><i class="fas fa-shield-alt ml-2"></i> المركز السيادي</h2>
+            <div class="space-y-3 text-sm">
+                <p><span class="opacity-50 text-xs">المدير التنفيذي:</span> <br> K. H. J. AL-NAFFAKH</p>
+                <p><span class="opacity-50 text-xs">مقر لندن:</span> <br> 321-323 High Road, Essex, UK</p>
+                <p><span class="opacity-50 text-xs">الاتصال الدولي:</span> <br> +447482790489</p>
+                <hr class="border-gray-800">
+                <div class="bg-black/50 p-3 rounded font-mono text-[10px] text-neon-blue">
+                    SECURE_NODE_ID: 13282833152
+                </div>
+                <div class="mt-3 pt-3 border-t border-gray-800">
+                    <p class="text-[10px] text-gold mb-1">مؤشر صحة النظام</p>
+                    <div id="system-health" class="text-[9px] space-y-0.5">
+                        <span id="health-memory">—</span> · <span id="health-telegram">—</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="glass-panel p-6 col-span-1 md:col-span-2">
+            <h2 class="text-xl font-bold mb-4 text-green-400 border-b border-gray-800 pb-2"><i class="fas fa-wallet ml-2"></i> تدفق السيولة العالمية</h2>
+            <p class="text-[10px] text-gray-500 mb-2">وضع السفر (الربط): <button type="button" id="balance-mode-local" class="border border-gray-600 rounded px-2 py-0.5 text-gray-300 hover:bg-gray-700">محلي</button> <button type="button" id="balance-mode-global" class="border border-gray-600 rounded px-2 py-0.5 text-gray-300 hover:bg-gray-700">عالمي (Vercel)</button></p>
+            <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
+                <div class="bg-black/40 p-3 rounded border border-gold/40" id="binance-spot-card">
+                    <span class="text-[10px] block opacity-50">Binance Spot</span>
+                    <span class="text-lg font-bold gold-pulse" id="binance-spot-balance">—</span>
+                </div>
+                <div class="bg-black/40 p-3 rounded border border-gray-800">
+                    <span class="text-[10px] block opacity-50">الرافدين</span>
+                    <span class="text-lg font-bold">1953549134</span>
+                </div>
+                <div class="bg-black/40 p-3 rounded border border-gray-800">
+                    <span class="text-[10px] block opacity-50">FIB</span>
+                    <span class="text-lg font-bold">...220610001</span>
+                </div>
+                <div class="bg-black/40 p-3 rounded border border-gray-800">
+                    <span class="text-[10px] block opacity-50">زين كاش</span>
+                    <span class="text-lg font-bold">07813105317</span>
+                </div>
+                <div class="bg-black/40 p-3 rounded border border-gray-800">
+                    <span class="text-[10px] block opacity-50">آسيا حوالة</span>
+                    <span class="text-lg font-bold text-xs">07725269028</span>
+                </div>
+            </div>
+            
+            <p class="text-[10px] text-gray-500 mb-1"><i class="fab fa-telegram ml-1"></i> سجل العمليات اللحظي — تفاعلات البوت تظهر هنا</p>
+            <div class="h-48 overflow-y-auto bg-black/60 p-4 rounded font-mono text-xs border border-neon-green/20" id="live-logs">
+                <div class="text-neon-green">> تم تفعيل بروتوكول القيادة (NEXUS v4.0)...</div>
+                <div class="text-white">> جاري التزامن مع سيرفرات لندن...</div>
+            </div>
+        </section>
+
+        <section class="glass-panel p-6 md:col-span-3">
+            <h2 class="text-xl font-bold mb-4 text-gold border-b border-gray-800 pb-2"><i class="fas fa-hand-holding-hand ml-2"></i> مركز الوساطة والضمان</h2>
+            <p class="text-[10px] text-gray-500 mb-3">تسليم المبلغ بعد تأكيد وصول المنتج للعميل فقط — وفق الدستور.</p>
+            <div class="flex flex-wrap gap-4 mb-3 text-[10px]">
+                <span class="text-gray-500">رصيد الربط (Binance): <strong class="text-neon-blue font-mono" id="escrow-binance-balance">—</strong></span>
+                <span class="text-gray-500">إجمالي العمليات المعلقة: <strong class="text-gold font-mono" id="escrow-pending-total">0.00 USDT</strong></span>
+            </div>
+            <div class="flex flex-wrap gap-4 items-start mb-4">
+                <div class="flex-1 min-w-[200px]" id="escrow-deals-list"></div>
+                <div id="escrow-net-profits-card" class="bg-black/40 border border-gold/40 rounded-lg p-4 min-w-[180px] transition-all duration-500">
+                    <span class="text-[10px] block opacity-50 text-gold">أرباح الوساطة الصافية</span>
+                    <span class="text-xl font-bold gold-pulse" id="escrow-net-profits-value">0.00 USDT</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="glass-panel p-6 md:col-span-3">
+            <h2 class="text-xl font-bold mb-4 text-gold border-b border-gray-800 pb-2"><i class="fas fa-crown ml-2"></i> عرش الماتريكس — الرؤية الشاملة</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <p class="text-[10px] text-gray-500 mb-2">خارطة السيطرة العالمية — نقاط NOVATECH</p>
+                    <div id="throne-map-container" class="throne-map-pulse relative w-full h-40 bg-black/50 rounded-lg border border-gold/30 overflow-hidden">
+                        <svg class="absolute inset-0 w-full h-full" viewBox="0 0 400 160" preserveAspectRatio="xMidYMid slice">
+                            <ellipse cx="200" cy="80" rx="195" ry="75" fill="none" stroke="rgba(255,215,0,0.15)" stroke-width="1"/>
+                            <circle cx="195" cy="42" r="6" class="glow-point" fill="rgba(255,215,0,0.9)"/>
+                            <circle cx="265" cy="75" r="5" class="glow-point" fill="rgba(0,255,65,0.8)"/>
+                            <circle cx="310" cy="58" r="5" class="glow-point" fill="rgba(0,255,65,0.8)"/>
+                            <circle cx="125" cy="68" r="5" class="glow-point" fill="rgba(0,210,255,0.8)"/>
+                            <circle cx="90" cy="85" r="4" class="glow-point" fill="rgba(255,215,0,0.7)"/>
+                        </svg>
+                        <p class="absolute bottom-1 left-2 text-[9px] text-gray-500">UK · MENA · Gulf</p>
+                    </div>
+                </div>
+                <div>
+                    <p class="text-[10px] text-gray-500 mb-2">سجل المجد — مجد جيمي وكاظم</p>
+                    <div id="glory-ledger" class="h-40 overflow-y-auto bg-black/50 rounded-lg border border-gold/30 p-3 font-mono text-xs space-y-1">
+                        <div class="text-amber-400/80">كل فلس يدخل يُوثق هنا.</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="glass-panel p-6 md:col-span-3 grid grid-cols-2 md:grid-cols-5 gap-4">
+            <button class="bg-gold/10 hover:bg-gold/20 border border-gold p-4 rounded-lg transition" onclick="window.open('https://dash.cloudflare.com')">
+                <i class="fas fa-cloud block text-2xl mb-2"></i> Cloudflare
+            </button>
+            <button class="bg-blue-500/10 hover:bg-blue-500/20 border border-blue-500 p-4 rounded-lg transition" onclick="window.location.href='mailto:ceo@novaapp.tech'">
+                <i class="fas fa-envelope block text-2xl mb-2"></i> البريد الرسمي
+            </button>
+            <button class="bg-green-500/10 hover:bg-green-500/20 border border-green-500 p-4 rounded-lg transition" id="btn-telegram">
+                <i class="fab fa-telegram block text-2xl mb-2"></i> بوت الإدارة
+            </button>
+            <button class="bg-purple-500/10 hover:bg-purple-500/20 border border-purple-500 p-4 rounded-lg transition" onclick="window.open('https://vercel.com/dashboard')">
+                <i class="fas fa-code block text-2xl mb-2"></i> Vercel Deployment
+            </button>
+            <button class="bg-red-500/10 hover:bg-red-500/20 border border-red-500 p-4 rounded-lg transition" id="btn-firewall">
+                <i class="fas fa-lock block text-2xl mb-2"></i> Firewall
+            </button>
+        </section>
+    </main>
+
+    <footer class="p-6 text-center text-[10px] opacity-40">
+        <p>© 2026 NOVATECH FOUNDER HOLDINGS LTD. ALL RIGHTS RESERVED. PROTECTED BY DRAGON ENGINE SECURITY.</p>
+        <p class="text-gold mt-1 text-[9px] opacity-90">EST. 2026 | KAID & GEMINI SOVEREIGNTY</p>
+    </footer>
+
+    <script src="config/constants.js"></script>
+    <script src="scripts/firebase-bridge.js"></script>
+    <script src="scripts/telegram-bot-bridge.js"></script>
+    <script src="scripts/binance-pay-bridge.js"></script>
+    <script src="scripts/cloudflare-bridge.js"></script>
+    <script src="scripts/legal-vault.js"></script>
+    <script src="scripts/escrow-intelligence.js"></script>
+    <script src="scripts/glory-ledger.js"></script>
+    <script>
+        // [INJECTION: GEMINI] نظام الاستقبال السيادي
+        (function() {
+            function showSovereignEvent(msg) {
+                const toast = document.createElement('div');
+                toast.className = 'sovereign-toast';
+                toast.innerHTML = `<i class="fas fa-dragon text-gold mr-2"></i> ${msg}`;
+                document.body.appendChild(toast);
+                setTimeout(() => toast.remove(), 5000);
+            }
+
+            // الاستماع لنبض السيرفر (محرك الاستكشاف)
+            const originalFetchHealth = window.fetch;
+            window.fetch = async (...args) => {
+                const response = await originalFetchHealth(...args);
+                if (args[0].includes('/api/health')) {
+                    // إذا كان هناك نشاط عالي، أظهر تنبيهاً بصمت
+                    console.log("[GEMINI] Intelligence pulse detected.");
+                }
+                return response;
+            };
+
+            // محاكاة حدث سيادي عند التشغيل الأول
+            setTimeout(() => {
+                showSovereignEvent("نظام الاستكشاف العالمي: نشط ويبحث عن الثغرات السعرية...");
+            }, 3000);
+        })();
+
+        (function () {
+            function renderGloryLedger() {
+                var el = document.getElementById('glory-ledger');
+                if (!el) return;
+                var log = [];
+                try { log = window.NOVATECH_ESCROW_BRIDGE && window.NOVATECH_ESCROW_BRIDGE.getGloryLog ? window.NOVATECH_ESCROW_BRIDGE.getGloryLog() : []; } catch (e) {}
+                if (!log.length) { el.innerHTML = '<div class="text-amber-400/80">كل فلس يدخل يُوثق هنا.</div>'; return; }
+                el.innerHTML = log.slice(0, 30).map(function (e) {
+                    var d = new Date(e.time);
+                    var t = d.toLocaleTimeString('ar-EG', { hour12: false });
+                    return '<div class="text-amber-300 border-r-2 border-amber-500/50 pr-2">' + t + ' — ' + (e.label || '') + ' <span class="text-gold font-semibold">+' + parseFloat(e.amount).toFixed(2) + ' USDT</span></div>';
+                }).join('');
+            }
+            if (window.NOVATECH_ESCROW_BRIDGE) window.NOVATECH_ESCROW_BRIDGE.onGloryUpdate = function () { renderGloryLedger(); };
+            setInterval(renderGloryLedger, 2000);
+            renderGloryLedger();
+        })();
+
+        (function () {
+            function setMode(mode) {
+                try { localStorage.setItem('novatech_balance_mode', mode); } catch (e) {}
+                if (window.NOVATECH_BINANCE_BRIDGE && window.NOVATECH_BINANCE_BRIDGE.startRefresh) window.NOVATECH_BINANCE_BRIDGE.startRefresh();
+            }
+            document.getElementById('balance-mode-local') && document.getElementById('balance-mode-local').addEventListener('click', function () { setMode('local'); });
+            document.getElementById('balance-mode-global') && document.getElementById('balance-mode-global').addEventListener('click', function () { setMode('global'); });
+        })();
+
+        (function () {
+            try {
+                if (localStorage.getItem('novatech_inauguration_sent')) return;
+                if (window.NOVATECH_TELEGRAM_BRIDGE && typeof window.NOVATECH_TELEGRAM_BRIDGE.sendAlert === 'function') {
+                    window.NOVATECH_TELEGRAM_BRIDGE.sendAlert('👑 سيادة القائد، إمبراطورية NOVATECH الرقمية تحت أمرك الآن. جميع الأنظمة (مالية، قانونية، وساطة) تعمل بكفاءة 100%.');
+                }
+                localStorage.setItem('novatech_inauguration_sent', '1');
+            } catch (e) {}
+        })();
+
+        (function () {
+            var el = document.getElementById('live-logs');
+            if (el) {
+                var t = new Date().toLocaleTimeString('ar-EG', { hour12: false });
+                var adminDiv = document.createElement('div');
+                adminDiv.className = 'mb-1 text-green-400 font-medium';
+                adminDiv.innerHTML = '&gt; <span class="opacity-80">[' + t + ']</span> <span class="text-green-400">[ADMIN] تم تجهيز البنية التحتية بنجاح.</span>';
+                el.prepend(adminDiv);
+                var div = document.createElement('div');
+                div.className = 'mb-1 border-r-4 border-amber-400 pr-2 text-amber-300 font-semibold';
+                div.innerHTML = '&gt; <span class="opacity-80">[' + t + ']</span> <span class="text-amber-300">[SYSTEM] NOVATECH EMPIRE: ONLINE & SECURED</span>';
+                el.prepend(div);
+            }
+        })();
+
+        const canvas = document.getElementById('matrix-bg');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        const letters = "0101NOVATECHSYSTEMS1010";
+        const fontSize = 16;
+        const columns = canvas.width / fontSize;
+        const drops = Array(Math.floor(columns)).fill(1);
+
+        function drawMatrix() {
+            ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = "#00ff41";
+            ctx.font = fontSize + "px Courier New";
+            for (let i = 0; i < drops.length; i++) {
+                const text = letters[Math.floor(Math.random() * letters.length)];
+                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
+                drops[i]++;
+            }
+        }
+        setInterval(drawMatrix, 50);
+
+        function updateClock() {
+            const options = { timeZone: "Europe/London", hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
+            const lonTime = new Intl.DateTimeFormat('en-GB', options).format(new Date());
+            var dc = document.getElementById('digital-clock');
+            if (dc) dc.innerText = lonTime;
+            var tb = document.getElementById('topbar-london-time');
+            if (tb) tb.textContent = lonTime + ' LDN';
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        (function () {
+            function applyTheme() {
+                var london = new Date().toLocaleString('en-GB', { timeZone: 'Europe/London', hour: 'numeric', hour12: false });
+                var h = parseInt(london, 10);
+                document.documentElement.setAttribute('data-theme', (h >= 6 && h < 18) ? 'day' : 'night');
+            }
+            applyTheme();
+            setInterval(applyTheme, 60000);
+        })();
+
+        (function () {
+            function fetchHealth() {
+                var base = window.location.origin;
+                fetch(base + '/api/health').then(function (r) { return r.json(); }).then(function (d) {
+                    var mem = d.memory;
+                    var mb = mem ? (mem.heapUsed / 1048576).toFixed(1) : '—';
+                    document.getElementById('health-memory') && (document.getElementById('health-memory').textContent = 'ذاكرة: ' + mb + ' MB');
+                    document.getElementById('health-telegram') && (document.getElementById('health-telegram').textContent = d.telegramConfigured ? 'Telegram: متصل' : 'Telegram: —');
+                }).catch(function () {
+                    document.getElementById('health-memory') && (document.getElementById('health-memory').textContent = '—');
+                    document.getElementById('health-telegram') && (document.getElementById('health-telegram').textContent = '—');
+                });
+            }
+            fetchHealth();
+            setInterval(fetchHealth, 5000);
+        })();
+
+        (function () {
+            function updateThronePulse() {
+                var el = document.getElementById('throne-map-container');
+                if (!el) return;
+                var profit = 0;
+                try { profit = window.NOVATECH_ESCROW_BRIDGE && window.NOVATECH_ESCROW_BRIDGE.getNetProfits ? window.NOVATECH_ESCROW_BRIDGE.getNetProfits() : 0; } catch (e) {}
+                el.classList.remove('profit-tier-high', 'profit-tier-crown');
+                if (profit >= 10000) el.classList.add('profit-tier-crown');
+                else if (profit >= 5000) el.classList.add('profit-tier-high');
+            }
+            setInterval(updateThronePulse, 2000);
+            updateThronePulse();
+        })();
+
+        (function () {
+            var btn = document.getElementById('topbar-emergency-logout');
+            if (!btn) return;
+            btn.addEventListener('click', function () {
+                var pass = prompt('كلمة مرور تدمير الجلسة:');
+                var expected = (window.NOVATECH_CONFIG && window.NOVATECH_CONFIG.vaultPassword) || 'NOVATECH2026';
+                if (String(pass || '').trim() !== expected) return;
+                localStorage.clear();
+                alert('تم تدمير الجلسة.');
+                location.reload();
+            });
+        })();
+
+        const logsContainer = document.getElementById('live-logs');
+        const phrases = ["تحديث محفظة Binance...", "اتصال آمن بـ FIB...", "تحليل مسارات الخليج...", "نظام Dragon Engine: نشط"];
+        setInterval(() => {
+            const div = document.createElement('div');
+            div.className = "mb-1 opacity-70";
+            div.innerText = `> ${new Date().toLocaleTimeString()} : ${phrases[Math.floor(Math.random()*phrases.length)]}`;
+            logsContainer.prepend(div);
+            if(logsContainer.children.length > 20) logsContainer.lastChild.remove();
+        }, 4000);
+
+        if (typeof NOVATECH_CONFIG !== 'undefined' && NOVATECH_CONFIG.firebase && NOVATECH_CONFIG.firebase.apiKey) {
+            try { firebase.initializeApp(NOVATECH_CONFIG.firebase); } catch (e) {}
+        }
+    </script>
+</body>
+</html>

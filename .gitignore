@@ -1,0 +1,11 @@
+# بيئة ومفاتيح سرية
+.env
+.env.local
+.env.*.local
+
+# لا ترفع المفتاح السري في مستودعات عامة (استخدم Environment Variables في Vercel)
+# config/binance-secret.server.js
+
+node_modules/
+logs/
+*.log

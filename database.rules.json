@@ -1,0 +1,10 @@
+{
+  "rules": {
+    "sovereign": {
+      "net_profits": {
+        ".read": "auth !== null && auth.uid === 'COMMANDER_UID'",
+        ".write": "auth !== null && auth.uid === 'COMMANDER_UID'"
+      }
+    }
+  }
+}
