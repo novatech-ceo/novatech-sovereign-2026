@@ -15,7 +15,7 @@ function binanceAccount(apiKey, secret) {
   const timestamp = Date.now();
   const query = `timestamp=${timestamp}`;
   const sig = sign(query, secret);
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     const apiPath = '/api/v3/account?' + query + '&signature=' + sig;
     https.get({
       hostname: 'api.binance.com',
@@ -28,13 +28,19 @@ function binanceAccount(apiKey, secret) {
       res.on('end', () => {
         try {
           const j = JSON.parse(body);
-          if (j.balances) {
+          if (j.balances && Array.isArray(j.balances)) {
             const usdt = (j.balances.find(b => b.asset === 'USDT') || {}).free || '0';
             resolve({ totalUSDT: parseFloat(usdt).toFixed(2) });
-          } else resolve({ totalUSDT: '0.00' });
-        } catch (e) { reject(e); }
+          } else if (j.code !== undefined) {
+            resolve({ totalUSDT: '—' });
+          } else {
+            resolve({ totalUSDT: '0.00' });
+          }
+        } catch (e) {
+          resolve({ totalUSDT: '—' });
+        }
       });
-    }).on('error', reject);
+    }).on('error', () => resolve({ totalUSDT: '—' }));
   });
 }
 
@@ -42,6 +48,7 @@ module.exports = async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
   if (req.method === 'OPTIONS') {
     res.status(204).end();
     return;
@@ -50,9 +57,11 @@ module.exports = async (req, res) => {
     res.status(405).json({ error: 'Method not allowed' });
     return;
   }
-  const apiKey = process.env.BINANCE_API_KEY;
-  const secret = process.env.BINANCE_SECRET;
-  if (!apiKey || !secret) {
+  const apiKey = process.env.BINANCE_API_KEY || '';
+  const secret = process.env.BINANCE_SECRET || '';
+  // مؤقت: للتحقق من قراءة المفاتيح في سجلات Vercel (أول 4 أحرف فقط)
+  console.log('[BALANCE] API_KEY prefix:', apiKey ? apiKey.slice(0, 4) + '...' : 'MISSING', '| SECRET set:', !!secret);
+  if (!apiKey.trim() || !secret.trim()) {
     res.status(200).json({ totalUSDT: '—' });
     return;
   }
@@ -60,6 +69,6 @@ module.exports = async (req, res) => {
     const data = await binanceAccount(apiKey, secret);
     res.status(200).json(data);
   } catch (e) {
-    res.status(500).json({ totalUSDT: '—' });
+    res.status(200).json({ totalUSDT: '—' });
   }
 };
