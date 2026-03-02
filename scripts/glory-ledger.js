@@ -14,7 +14,7 @@
     }
     try {
       // حفظ الأرباح الصافية في المسار السيادي
-      await db.ref('sovereign/net_profits').set({
+      await db.ref('sovereign/global_stats/net_profits').set({
         amount: profitValue,
         last_update: new Date().toISOString(),
         commander_id: '1066388294'
